@@ -1,0 +1,101 @@
+version: "3.7"
+services:
+  # Api
+  api:
+    build:
+      args:
+        user: user
+        uid: 1000
+      context: ./api
+      dockerfile: Dockerfile
+    image: travellist
+    container_name: api
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./api:/var/www
+      - ./docker-compose/nginx/custom.php.ini:/usr/local/etc/php/conf.d/custom.php.ini
+    links:
+      - elasticsearch
+      - nginx
+    networks:
+      network:
+        ipv4_address: 172.18.0.2
+
+  # DB
+  db:
+    image: mysql:latest
+    container_name: db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: databaase
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_PASSWORD: password
+      MYSQL_USER: user
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+    networks:
+      network:
+        ipv4_address: 172.18.0.3
+
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 8000:83 
+    volumes:
+      - ./api:/var/www/
+      - ./docker-compose/nginx:/etc/nginx/conf.d/
+    networks:
+      network:
+        ipv4_address: 172.18.0.4
+
+  # Elastic
+  elasticsearch:
+    container_name: elasticsearch
+    ports:
+      - 9222:9200
+    restart: unless-stopped
+    image: elasticsearch:6.8.16
+    volumes:
+      - ./docker-compose/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/elasticsearch.yml
+    networks:
+      network:
+        ipv4_address: 172.18.0.5
+
+  # Redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - 6380:6380
+    networks:
+      network:
+        ipv4_address: 172.18.0.6
+
+  # WEB 
+  web:
+    container_name: web
+    build: ./web
+    volumes:
+      - './web:/app'
+      - '/app/node_modules'
+    ports:
+      - 3101:3000
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: npm run dev
+    networks:
+      network:
+        ipv4_address: 172.18.0.7
+
+networks:
+  network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
