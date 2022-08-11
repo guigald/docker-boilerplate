@@ -25,23 +25,15 @@ sudo chown $USER /var/run/docker.sock
 ### Cloning projects:
 - Docker directory
 ```bash
-git clone git@github.com:liontax/irpronto-docker.git lion-docker
+git clone git@github.com:guigald/docker-boilerplate.git docker
 ```
 - Enter the docker folder
 ```bash
-cd lion-docker
+cd docker
 ```
 - Api `PHP`
 ```bash
-git clone git@github.com:liontax/lion-api-8.git api
-```
-- Web App `ReactJs`
-```bash
-git clone git@github.com:liontax/lion-web.git web
-```
-- Backoffice **(Dashboard)** `ReactJs`
-```bash
-git clone git@github.com:liontax/backoffice.git backoffice
+git clone git@github.com:guigald/api-boilerplate.git api
 ```
 ---
 
@@ -76,13 +68,13 @@ docker-compose up -d
 ```
 
 ##### Configuring Api
-Get into the lion_api container:
+Get into the api container:
 ```bash
-docker exec -it lion_api bash
+docker exec -it api bash
 ```
 ---
 
-Inside the lion_api container, run composer and artisan commands to initialize the api and exit:
+Inside the api container, run composer and artisan commands to initialize the api and exit:
 ```bash
 composer install # install dependencies
 composer dump-autoload # reveal the untracked classes
@@ -98,7 +90,7 @@ exit
 ### WEB
 - Web: http://localhost:3101
 - Backoffice: http://localhost:3102
-- API: http://localhost:8000/api/v1
+- API: http://localhost:8000/v1
 
 ### Mysql
 - MySql: Get the host by running the command below. Username, port and password have already been defined in .env file 
@@ -115,5 +107,5 @@ docker inspect db | grep IPAddress
 ### API
 Run the command below to adjust the code according to PSR-1 and PSR-12
 ```bash
-docker exec -it lion_api bash ./contrib/csfix.sh # Api
+docker exec -it api bash ./contrib/csfix.sh # Api
 ```
